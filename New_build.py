@@ -1,14 +1,13 @@
 #Has code with the Submissions number updated.
 import streamlit as st
+import pandas as pd
+import pyperclip
+import os
+import requests
+from io import BytesIO
 
 # Set initial scale for very small screens
 st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.5">', unsafe_allow_html=True)
-
-
-import streamlit as st
-import pandas as pd
-import pyperclip  # Import the pyperclip module for clipboard operations
-import os
 
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 image_path = r"C:\Users\User\Desktop\Career-Exploration-main\graphics\VS-logo.png"
@@ -30,6 +29,11 @@ user_access_codes = {
 # Prompt the user to enter their access code
 entered_code = st.sidebar.text_input("Enter Your Access Code:", type="password")
 
+# Check if either of the boxes is not selected
+if not entered_code:
+    st.error("Please fill in all the compulsory fields marked with * before proceeding.")
+    st.stop()
+
 # Filter the user names based on the entered access code
 filtered_user_names = [user_name for user_name, access_code in user_access_codes.items() if entered_code == access_code]
 
@@ -37,33 +41,64 @@ filtered_user_names = [user_name for user_name, access_code in user_access_codes
 
 selected_user_name = st.sidebar.selectbox('Select Your User Name:', filtered_user_names)
 
+# Function to read all CSV files from a folder and store them in a dictionary
+def read_assignment_files(folder_path):
+    file_mapping = {}
+    csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
+    
+    for file_name in csv_files:
+        file_path = os.path.join(folder_path, file_name)
+        file_mapping[file_name] = pd.read_csv(file_path)
+    
+    return file_mapping
 
-
-# Read all assignment files and store them in a dictionary
-file_mapping = {
-    'CAP Classwork.csv': pd.read_csv(r"C:\Users\User\Downloads\Assignment_Assignment_CAP Classwork (13).csv"),
-    'CV_ Resume.csv': pd.read_csv(r"C:\Users\User\Downloads\Assignment_Assignment_CV_ Resume (16).csv"),
-    'Full CAP - GoalA+B.csv': pd.read_csv(r"C:\Users\User\Downloads\Assignment_Assignment_Full CAP - GoalA+B (13).csv"),
-    'Long term dreams and short term goals.csv': pd.read_csv(r"C:\Users\User\Downloads\Assignment_Assignment_Long term dreams and short term goals (31).csv"),
-    'Preparing for PG_Masters.csv': pd.read_csv(r"C:\Users\User\Downloads\Assignment_Assignment_Preparing for PG_Masters (33).csv")
-}
-
-# Read the category dataset and extract unique categories
-category_dataset = pd.read_csv("C:/Users/User/Downloads/Comments sheet.csv", encoding='latin1')  # Replace 'path_to_category_dataset.csv' with the actual path
-unique_categories = category_dataset['Category '].unique()
-unique_status=category_dataset['Accepted /Rejected'].unique()
-
-# Define function to get dataset based on selected assignment file
+# Function to get the dataset for a selected assignment file
 def get_dataset(selected_assignment_file):
     return file_mapping[selected_assignment_file]
 
-data = get_dataset('CAP Classwork.csv')  # Initialize the data with one of the assignment files
+# Define the folder path for CSV files
+folder_path = r"C:\Users\User\OneDrive\VS GUI\GUI\venv\stemcheck files"
 
+# Read all assignment files from the folder
+file_mapping = read_assignment_files(folder_path)
+
+# Streamlit app interface
 # Create the Streamlit app interface
 st.title('STEMCHECK - STEM Assignment Checker Kit')
 
-# Create a dropdown to select the assignment file
-selected_assignment_file = st.sidebar.selectbox('Select Assignment File', list(file_mapping.keys()))
+# Select the assignment file from the available files
+selected_assignment_file = st.sidebar.selectbox('Select an assignment file', list(file_mapping.keys()))
+if selected_assignment_file is not None:
+    #st.write(f"Displaying data for file: {selected_assignment_file}")
+    selected_dataset = get_dataset(selected_assignment_file)
+    #st.write(selected_dataset)
+
+
+# Read the category dataset and extract unique categories
+# URL pointing to the CSV file
+
+file_url = 'https://bvvaailuzioczysisnoc.supabase.co/storage/v1/object/sign/Stemcheck/Comments_sheet.csv?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJTdGVtY2hlY2svQ29tbWVudHNfc2hlZXQuY3N2IiwiaWF0IjoxNzE3NjYwMzQ1LCJleHAiOjE3NDkxOTYzNDV9.gUNII7Hhc3yqRNJKJ780GVlfvOTEAi9fhxIh9AWbGV0&t=2024-06-06T07%3A52%3A24.268Z'
+
+# Make a GET request to the URL to retrieve the CSV file
+try:
+    response = requests.get(file_url)
+    response.raise_for_status()  # Raise an error for bad status codes
+
+    # Read the content of the response as a pandas DataFrame, specifying the appropriate encoding
+    category_dataset = pd.read_csv(BytesIO(response.content), encoding='latin1')  # You can try 'latin1' encoding as an alternative
+    # Proceed with processing the data in the dataframe 'df'
+except requests.exceptions.RequestException as e:
+    print("An error occurred while accessing the CSV file:", e)
+except Exception as e:
+    print("An error occurred while reading the CSV file:", e)
+
+
+# Read the category dataset and extract unique categories
+unique_categories = category_dataset['Category '].unique()
+unique_status=category_dataset['Accepted /Rejected'].unique()
+
+data = get_dataset(selected_assignment_file)
+
 
 # Create a dropdown to select the file status
 file_statuses = data['status'].unique()
@@ -77,6 +112,15 @@ filtered_data = filtered_data[filtered_data['status'] == selected_status]
 # Create a dropdown to select the email ID
 if 'user/email' in filtered_data.columns:
     email_list = filtered_data['user/email'].str.split('-').str[1].tolist()  # Extract email IDs after the hyphen
+
+    # Placeholder to store the list of processed email IDs
+
+    if "processed_emails" not in st.session_state:
+        st.session_state.processed_emails = []  # Initialize the variable
+    
+    # Filter out the processed email IDs
+    email_list = [email for email in email_list if email not in st.session_state.processed_emails]
+    
     selected_email = st.selectbox('Select Email ID:', email_list)
     # Filter data based on selected email
     filtered_email_data = filtered_data[filtered_data['user/email'] == 'vigyanshaalainternational1617-'+selected_email]
@@ -95,8 +139,6 @@ if 'user/email' in filtered_data.columns:
        latest_submission_col = None
        latest_submission_no = None
     
-    
-       
 
     # Get the latest filled column without NA or blank for the file name format 'data/{i}/fileName'
     for col in filtered_email_data.columns[::-1]:  # Iterate in reverse to get the last filled column
@@ -151,9 +193,15 @@ if 'user/email' in filtered_data.columns:
 
     
 
-# Create a dropdown to select the categories
-selected_category = st.sidebar.selectbox('Select category', unique_categories)
-selected_category_status=st.sidebar.radio('Select category status',unique_status)
+# Display the select boxes with asterisk for compulsory selection
+selected_category = st.sidebar.selectbox('Select category*', unique_categories, key='category_select')
+selected_category_status = st.sidebar.radio('Select comments category status*', unique_status, key='category_status_radio')
+
+# Check if either of the boxes is not selected
+if not selected_category or not selected_category_status:
+    st.error("Please fill in all the compulsory fields marked with * before proceeding.")
+    st.stop()
+    
 
 # Filter the comments based on acceptance or rejection
 if 'Accepted /Rejected' in category_dataset.columns and 'Comment' in category_dataset.columns:
@@ -161,8 +209,14 @@ if 'Accepted /Rejected' in category_dataset.columns and 'Comment' in category_da
     
     if selected_category_accepted:
         # Create a multiselect to choose from the available comments
-        selected_comments_accepted = st.multiselect('Select Comments:', selected_category_accepted)
+        selected_comments_accepted = st.multiselect('Select Comments:*', selected_category_accepted)
 
+
+        # Check if either of the boxes is not selected
+        if not selected_comments_accepted:
+            st.error("Please fill in all the compulsory fields marked with * before proceeding.")
+            st.stop()
+        
         if selected_comments_accepted:
             selected_comments_text_accepted = '\n'.join(selected_comments_accepted)
             comment_area_accepted = st.text_area('Selected Comments:', value=selected_comments_text_accepted, height=120)
@@ -182,8 +236,12 @@ if 'Accepted /Rejected' in category_dataset.columns and 'Comment' in category_da
 # Create a text box to enter marks for the selected email ID and assignment file
 if selected_email and selected_assignment_file:
     marks_key = f"marks_{selected_email}_{selected_assignment_file}"
-    marks = st.text_input("Enter Marks:", key=marks_key)
-
+    marks = st.text_input("Enter Marks:*", key=marks_key)
+    # Check if either of the boxes is not selected
+    if not marks:
+        st.error("Please fill in all the compulsory fields marked with * before proceeding.")
+        st.stop()
+        
     if marks:
         st.write(f"Marks entered: {marks}")
 
@@ -192,41 +250,49 @@ if selected_email and selected_assignment_file:
 # Add an empty line to visually separate the elements
 st.write("")
 
-unique_key=latest_submission_email+ " " +f",Submssion no {latest_submission_no}"
+unique_key = latest_submission_email + " " + f",Email {selected_email}"
 # Define a function to create a DataFrame with the provided data
-def create_feedback_dataframe(selected_assignment_file,selected_status ,latest_submission_email,latest_submission_no, selected_email, latest_messages, selected_category_status,selected_comments_accepted,marks,unique_key):
+def create_feedback_dataframe(selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_category_status, selected_comments_accepted,selected_user_name, marks, unique_key):
     data = {
-        'User Name' : [selected_user_name],
-        'Assignment File': [selected_assignment_file],
-        'File Status': [selected_status],
-        'PDF Name': [latest_submission_email],
-        'Submission Number':[latest_submission_no],
-        'Email ID': [selected_email],
-        'Message Displayed': [latest_messages],
+        'Email_ID': [selected_email],
+        'Assignment_File': [selected_assignment_file],
+        'File_Status': [selected_status],
+        'PDF_Name': [latest_submission_email],
+        'Submission_Number': [latest_submission_no],
+        'Message_Displayed': [latest_messages],
         'Category Status': [selected_category_status],
+        'Marks': [marks],
         'Comments': [", ".join(selected_comments_accepted) if selected_comments_accepted else None],
-        'Marks':[marks],
-        'key':[unique_key]
+        'User_Name': [selected_user_name],
+        'key': [unique_key]
     }
     feedback_df = pd.DataFrame(data)
     return feedback_df
 
-# Create an empty list to store the feedback data
-all_feedback_data = []
 
 
-import os
 
 # Create a button to copy the comment for the email ID and save feedback data
 if selected_comments_accepted:
-    copy_button_text_accepted = "Copy Comment & Save Feedback Data"
+    combined_button_text = "Copy Comment, Save Feedback Data, and Extract Email IDs"
     if st.button(copy_button_text_accepted):
         # Copy the comment to the clipboard
         pyperclip.copy(selected_comments_text_accepted)
         
-        
         # Create a DataFrame with the feedback data
-        feedback_df = create_feedback_dataframe(selected_assignment_file,selected_status ,latest_submission_email,latest_submission_no,selected_email, latest_messages, selected_category_status,selected_comments_accepted,marks,unique_key)
+        feedback_df = create_feedback_dataframe(selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_category_status, selected_comments_accepted,selected_user_name, marks, unique_key)
+        Feedback_file= pd.read_excel(r"C:\Users\User\Downloads\Feedback.xlsx")
+
+
+        if filtered_user_names:
+        # Display the count for the selected user name
+            selected_user_count=0
+            selected_user_count = Feedback_file[Feedback_file['User_Name'] == selected_user_name].shape[0]
+            selected_user_count=selected_user_count+1
+            st.write(f"Total Assignment corrected by {selected_user_name} : {selected_user_count+1}")
+        else:
+            st.write("No user found for the entered access code. Please enter a valid code.")
+
         
         # Check if the Excel file already exists
         if os.path.isfile(r"C:\Users\User\Downloads\Feedback.xlsx"):
@@ -248,62 +314,17 @@ if selected_comments_accepted:
 Feedback_file= pd.read_excel(r"C:\Users\User\Downloads\Feedback.xlsx")
 
 
-# If a user name is found for the entered access code, display the select box for that user
-if filtered_user_names:
+# Extract and save email IDs
+        try:
+            feedback_data = pd.read_excel(r"C:\Users\User\Downloads\Feedback.xlsx")
+            grouped_data = feedback_data.groupby(['key', 'Email_ID']).size().reset_index().drop(0, axis=1)
+            new_dataframe = pd.DataFrame({'key': grouped_data['key'], 'email_ids': grouped_data['Email_ID']})
+            new_dataframe.to_excel(r"C:\Users\User\Downloads\unique_email_ids_unique_keys.xlsx", index=False)
+            st.write('Email IDs with unique values in the unique key column have been saved to unique_email_ids_unique_keys.xlsx')
+        except FileNotFoundError:
+            st.write("The Feedback.xlsx file does not exist. Please check the file path.")
+        except KeyError:
+            st.write("The 'Unique key' column does not exist in the dataset. Please check the column name.")
 
-    # Display the count for the selected user name
-    selected_user_count = Feedback_file[Feedback_file['User Name'] == selected_user_name].shape[0]
-    st.write(f"The count for {selected_user_name} is: {selected_user_count}")
-else:
-    st.write("No user found for the entered access code. Please enter a valid code.")
-
-
-
-# Create the user interface in Streamlit
-st.write('Click the button below to extract email IDs with unique keys.')
-
-# Function to extract email IDs with unique keys and save to Excel
-def extract_and_save_email_ids():
-    try:
-        # Read the feedback file into a dataframe
-        feedback_data = Feedback_file
-
-        # Group the data by unique values in the key column without aggregating the email IDs
-        grouped_data = feedback_data.groupby(['key', 'Email ID']).size().reset_index().drop(0, axis=1)
-
-        # Create a new dataframe with the email IDs and associated unique values in the key column
-        new_dataframe = pd.DataFrame({
-            'key': grouped_data['key'],
-            'email_ids': grouped_data['Email ID']
-        })
-
-        # Write the data with email IDs having multiple unique key values to a new Excel sheet
-        new_dataframe.to_excel(r"C:\Users\User\Downloads\unique_email_ids_unique_keys.xlsx", index=False)
-        st.write('Email IDs with unique values in the unique key column have been saved to unique_email_ids_unique_keys.xlsx')
-    except FileNotFoundError:
-        st.write("The feedback_file.csv does not exist. Please check the file path.")
-    except KeyError:
-        st.write("The 'Unique key' column does not exist in the dataset. Please check the column name.")
-
-# Check if the button is clicked
-if st.button('Extract Email IDs'):
-    extract_and_save_email_ids()  # Call the function to extract and save email IDs
-
-
-merged_data = email_list
-unique_email_data = pd.read_excel(r"C:\Users\User\Downloads\unique_email_ids_unique_keys.xlsx")
-
-# Check if the 'email_ids' column exists in the unique email data
-if 'email_ids' in unique_email_data.columns:
-    # Convert the merged_data list to a DataFrame
-    merged_data_df = pd.DataFrame({'email_ids': merged_data})
-
-    # Filter out emails that are not present in the unique email data
-    filtered_emails = merged_data_df[~merged_data_df['email_ids'].isin(unique_email_data['email_ids'])]
-    filtered_emails = filtered_emails['email_ids'].unique()
-
-    # Create a select box with the filtered unique email IDs
-    selected_email = st.selectbox('Select Email ID:', filtered_emails)
-else:
-    st.error("The 'email_ids' column does not exist in the unique email data.")
-
+        # Add the processed email to the session state to remove it from the dropdown
+        st.session_state.processed_emails.append(selected_email)
