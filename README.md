@@ -35,5 +35,5 @@ Creating the Streamlit Interface: Define the Streamlit interface within the main
 
 Running the Application: Follow Method 1 or Method 2 as mentioned in Instructions.
 
-#Conclusion:
+# Conclusion:
 By following this comprehensive readme, users can effectively run the STEM-Assignment-Checker-GUI application, automate the feedback process, generate excel sheet, and developers can maintain and update the application.
