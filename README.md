@@ -16,7 +16,7 @@ graphics: Images and logo files related to the project.
 # Prerequisites:
 Python installed (version 3.6 or higher).
 
-# Required Python libraries installed (pandas, streamlit, pyperclip, os, etc.).
+Required Python libraries installed (pandas, streamlit, pyperclip, os, etc.).
 
 Internet access for external resources.
 
