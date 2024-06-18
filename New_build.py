@@ -6,6 +6,8 @@ import os
 import requests
 from io import BytesIO
 
+from supabase_py import create_client,Client
+
 # Set initial scale for very small screens
 st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.5">', unsafe_allow_html=True)
 
@@ -40,6 +42,11 @@ filtered_user_names = [user_name for user_name, access_code in user_access_codes
 # If a user name is found for the entered access code, display the select box for that user
 
 selected_user_name = st.sidebar.selectbox('Select Your User Name:', filtered_user_names)
+
+selected_Cohort = st.sidebar.selectbox("Select a Cohort", ["Incubator_1","Incubator_2","Incubator_3"])
+
+# Display the selected option
+st.write("Selected Cohort:", selected_Cohort)
 
 # Function to read all CSV files from a folder and store them in a dictionary
 def read_assignment_files(folder_path):
@@ -250,7 +257,8 @@ if selected_email and selected_assignment_file:
 # Add an empty line to visually separate the elements
 st.write("")
 
-unique_key = latest_submission_email + " " + f",Email {selected_email}"
+unique_key = latest_submission_email + " " + f"_Email {selected_email}"+" "+f"_Sub No:{latest_submission_no}"
+
 # Define a function to create a DataFrame with the provided data
 def create_feedback_dataframe(selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_category_status, selected_comments_accepted,selected_user_name, marks, unique_key):
     data = {
@@ -264,67 +272,108 @@ def create_feedback_dataframe(selected_assignment_file, selected_status, latest_
         'Marks': [marks],
         'Comments': [", ".join(selected_comments_accepted) if selected_comments_accepted else None],
         'User_Name': [selected_user_name],
-        'key': [unique_key]
+        'key': [unique_key],
+        'Cohort':[selected_Cohort]
     }
     feedback_df = pd.DataFrame(data)
     return feedback_df
 
+url: str = 'https://bvvaailuzioczysisnoc.supabase.co'
+key: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2dmFhaWx1emlvY3p5c2lzbm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc1OTEwNTMsImV4cCI6MjAzMzE2NzA1M30.kDC8CsjhjB_XkVo9OM3EchNMWk5ytyc-s629I0-qr1k'
+supabase: Client = create_client(url, key)
+
+# Function to save feedback data to Supabase
+def save_feedback_to_supabase(feedback_data, table_name):
+    response = supabase.table(table_name).insert(feedback_data).execute()
+    return response
 
 
+# Function to read data from Supabase table
+def read_data_from_supabase(table_name):
+    response = supabase.table(table_name).select().execute()
+    if response.get('error'):
+        print(f"Error fetching data from '{table_name}': {response['error']}")
+        return None
+    return response.get('data')
 
-# Create a button to copy the comment for the email ID and save feedback data
+
+# Create a button to copy the comment for the email ID, save feedback data, and extract email IDs
 if selected_comments_accepted:
     combined_button_text = "Copy Comment, Save Feedback Data, and Extract Email IDs"
-    if st.button(copy_button_text_accepted):
+    if st.button(combined_button_text):
         # Copy the comment to the clipboard
         pyperclip.copy(selected_comments_text_accepted)
         
         # Create a DataFrame with the feedback data
-        feedback_df = create_feedback_dataframe(selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_category_status, selected_comments_accepted,selected_user_name, marks, unique_key)
-        Feedback_file= pd.read_excel(r"C:\Users\User\Downloads\Feedback.xlsx")
+        feedback_df = create_feedback_dataframe(unique_key, selected_user_name, selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_comments_accepted, marks,selected_Cohort)
+        
+        # Convert DataFrame to dictionary records
+        records = feedback_df.to_dict(orient='records')
+        
+        table_name = "TableF"
+        
+        # Save feedback data to Supabase
+        response = save_feedback_to_supabase(records, table_name)
+
+        
+        for record in records:
+            record_id = record.get('key')
+            
+            # Perform insertion or update based on record existence
+            existing_record = supabase.table(table_name).select().eq('key', record_id).execute()
+            
+            if existing_record.get('error'):
+                print(f"Error fetching existing record for key '{record_id}': {existing_record['error']}")
+            else:
+                if existing_record.get('data'):
+                    # Update the existing record
+                    response = supabase.table(table_name).update(record).eq('key', record_id).execute()
+                    print(f"Updated Record with key {record_id}: {response}")
+                else:
+                    # Insert a new record
+                    response = supabase.table(table_name).insert(record).execute()
+                    print(f"Inserted New Record with key {record_id}: {response}")
 
 
+        # Inform the user about the actions taken
+        st.write("Comment copied to clipboard, Feedback data saved to Feedback.xlsx")
+        
+
+        # Fetch and display data from Supabase table 'TableF'
+        supabase_table_name = 'TableF'
+        supabase_url = 'https://bvvaailuzioczysisnoc.supabase.co'
+        supabase_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2dmFhaWx1emlvY3p5c2lzbm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc1OTEwNTMsImV4cCI6MjAzMzE2NzA1M30.kDC8CsjhjB_XkVo9OM3EchNMWk5ytyc-s629I0-qr1k'
+
+        response = requests.get(f'{supabase_url}/rest/v1/{supabase_table_name}', headers={'apikey': supabase_key})
+
+        if response.status_code == 200:
+            data = response.json()
+            df = pd.DataFrame(data)
+            print(df)  # Display the fetched data
+        else:
+            print(f"Failed to fetch data from '{supabase_table_name}': {response.text}")
+
+        
         if filtered_user_names:
-        # Display the count for the selected user name
-            selected_user_count=0
-            selected_user_count = Feedback_file[Feedback_file['User_Name'] == selected_user_name].shape[0]
-            selected_user_count=selected_user_count+1
-            st.write(f"Total Assignment corrected by {selected_user_name} : {selected_user_count+1}")
+    # Group the DataFrame by 'Cohort' and 'User_Name' columns and count the number of occurrences
+            cohort_user_counts = df.groupby(['Cohort', 'User_Name']).size().reset_index(name='User_Count')
+
+        # Filter the cohort_user_counts DataFrame based on the selected_user_name
+            selected_user_cohort_count = cohort_user_counts[cohort_user_counts['User_Name'] == selected_user_name]
+            selected_user_cohort_count = cohort_user_counts[(cohort_user_counts['User_Name'] == selected_user_name) & (cohort_user_counts['Cohort'] == selected_Cohort)]
+
+            if not selected_user_cohort_count.empty:
+                st.write(f"Total Assignments corrected by {selected_user_name} in {selected_Cohort}: {selected_user_cohort_count['User_Count'].values[0]}")
+            else:
+                st.write(f"No assignments found for {selected_user_name} in {selected_Cohort}.")
         else:
             st.write("No user found for the entered access code. Please enter a valid code.")
 
+            
+
         
-        # Check if the Excel file already exists
-        if os.path.isfile(r"C:\Users\User\Downloads\Feedback.xlsx"):
-            # Read the existing Excel file
-            existing_data = pd.read_excel(r"C:\Users\User\Downloads\Feedback.xlsx")
-            
-            # Append the new feedback data below the existing data
-            updated_data = pd.concat([existing_data, feedback_df], ignore_index=True)
-            
-            # Write the updated data to the Excel file
-            updated_data.to_excel(r"C:\Users\User\Downloads\Feedback.xlsx", index=False)
-        else:
-            # If the Excel file does not exist, create a new file and write the feedback data
-            feedback_df.to_excel(r"C:\Users\User\Downloads\Feedback.xlsx", index=False)
-
-        st.write("Comment copied to clipboard and Feedback data saved to Feedback.xlsx")  # Inform the user about the actions taken
-
-
-Feedback_file= pd.read_excel(r"C:\Users\User\Downloads\Feedback.xlsx")
-
-
-# Extract and save email IDs
-        try:
-            feedback_data = pd.read_excel(r"C:\Users\User\Downloads\Feedback.xlsx")
-            grouped_data = feedback_data.groupby(['key', 'Email_ID']).size().reset_index().drop(0, axis=1)
-            new_dataframe = pd.DataFrame({'key': grouped_data['key'], 'email_ids': grouped_data['Email_ID']})
-            new_dataframe.to_excel(r"C:\Users\User\Downloads\unique_email_ids_unique_keys.xlsx", index=False)
-            st.write('Email IDs with unique values in the unique key column have been saved to unique_email_ids_unique_keys.xlsx')
-        except FileNotFoundError:
-            st.write("The Feedback.xlsx file does not exist. Please check the file path.")
-        except KeyError:
-            st.write("The 'Unique key' column does not exist in the dataset. Please check the column name.")
-
-        # Add the processed email to the session state to remove it from the dropdown
+# Add the processed email to the session state to remove it from the dropdown
         st.session_state.processed_emails.append(selected_email)
+
+
+
