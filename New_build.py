@@ -19,6 +19,12 @@ except ImportError:
 
 from supabase_py import create_client,Client
 
+try:
+    from supabase_py import create_client, Client
+except ImportError as e:
+    print(f"ImportError: {e}")
+
+
 # Set initial scale for very small screens
 st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.5">', unsafe_allow_html=True)
 
