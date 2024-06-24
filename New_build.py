@@ -7,18 +7,6 @@ from io import BytesIO
 from supabase_py import create_client, Client
 import sys
 
-try:
-    from supabase_py import create_client, Client
-except ImportError as e:
-    print(f"ImportError: {e}")
-    sys.exit(1)  # Exit the script or handle the error appropriately
-
-
-try:
-    # Import 'pyperclip' within a try-except block to guard against errors if the library is not available in the deployment environment
-    import pyperclip
-except ImportError:
-    pyperclip = None  # Assign 'pyperclip' as None to handle absence gracefully
 
 
 # Set initial scale for very small screens
@@ -149,7 +137,7 @@ if 'user/email' in filtered_data.columns:
     if selected_email:
         copy_email_button_text = "Copy Email Address"
         if st.button(copy_email_button_text):
-            pyperclip.copy(selected_email)  # Copy the email address to the clipboard
+            #pyperclip.copy(selected_email)  # Copy the email address to the clipboard
             st.write("Email address copied to clipboard")  # Inform the user that the email address has been copied
 
         
@@ -315,7 +303,7 @@ if selected_comments_accepted:
     combined_button_text = "Copy Comment, Save Feedback Data, and Extract Email IDs"
     if st.button(combined_button_text):
         # Copy the comment to the clipboard
-        pyperclip.copy(selected_comments_text_accepted)
+        #pyperclip.copy(selected_comments_text_accepted)
         
         # Create a DataFrame with the feedback data
         feedback_df = create_feedback_dataframe(unique_key, selected_user_name, selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_comments_accepted, marks,selected_Cohort)
