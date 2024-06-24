@@ -1,10 +1,21 @@
 #Has code with the Submissions number updated.
 import streamlit as st
 import pandas as pd
-import pyperclip
 import os
 import requests
 from io import BytesIO
+
+try:
+    # Import 'pyperclip' within a try-except block to guard against errors if the library is not available in the deployment environment
+    import pyperclip
+except ImportError:
+    pyperclip = None  # Assign 'pyperclip' as None to handle absence gracefully
+
+try:
+    # For the 'supabase_py' library, import the necessary modules directly without renaming
+    import supabase_py
+except ImportError:
+    supabase_py = None  # Assign 'supabase_py' as None to handle absence gracefully
 
 from supabase_py import create_client,Client
 
