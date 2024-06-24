@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import requests
 from io import BytesIO
-
+from supabase_py import create_client, Client
 import sys
 
 try:
@@ -19,12 +19,6 @@ try:
     import pyperclip
 except ImportError:
     pyperclip = None  # Assign 'pyperclip' as None to handle absence gracefully
-
-try:
-    # For the 'supabase_py' library, import the necessary modules directly without renaming
-    import supabase_py
-except ImportError:
-    supabase_py = None  # Assign 'supabase_py' as None to handle absence gracefully
 
 
 # Set initial scale for very small screens
