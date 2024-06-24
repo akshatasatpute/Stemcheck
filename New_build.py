@@ -5,6 +5,15 @@ import os
 import requests
 from io import BytesIO
 
+import sys
+
+try:
+    from supabase_py import create_client, Client
+except ImportError as e:
+    print(f"ImportError: {e}")
+    sys.exit(1)  # Exit the script or handle the error appropriately
+
+
 try:
     # Import 'pyperclip' within a try-except block to guard against errors if the library is not available in the deployment environment
     import pyperclip
@@ -16,13 +25,6 @@ try:
     import supabase_py
 except ImportError:
     supabase_py = None  # Assign 'supabase_py' as None to handle absence gracefully
-
-from supabase_py import create_client,Client
-
-try:
-    from supabase_py import create_client, Client
-except ImportError as e:
-    print(f"ImportError: {e}")
 
 
 # Set initial scale for very small screens
