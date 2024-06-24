@@ -1,0 +1,2 @@
+supabase-py
+pyperclip==1.8.2
