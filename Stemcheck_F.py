@@ -2,9 +2,12 @@ import streamlit as st
 import pandas as pd
 import pyperclip
 import os
+import requests
+import pandas as pd
 
+# Function to read CSV files from a folder path obtained from GitHub and store them in a dictionary
+from io import StringIO 
 from supabase_py import create_client,Client
-
 
 
 # Set initial scale for very small screens
@@ -45,19 +48,33 @@ selected_Cohort = st.sidebar.selectbox("Select an option", ["Incubator_1","Incub
 st.write("Selected Option:", selected_Cohort)
 
 # Read all assignment files and store them in a dictionary
-import os
-import pandas as pd
-import streamlit as st
-import pyperclip
 
-# Function to read all CSV files from a folder and store them in a dictionary
-def read_assignment_files(folder_path):
-    file_mapping = {}
-    csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
+
+# Function to read all CSV files from a folder and store them in a dictionary # Import StringIO directly from the io module
+
+# Function to read CSV files from a folder path obtained from GitHub and store them in a dictionary
+def read_assignment_files_from_github(folder_path_url):
+    response = requests.get(folder_path_url)  # Get folder contents from GitHub
     
-    for file_name in csv_files:
-        file_path = os.path.join(folder_path, file_name)
-        file_mapping[file_name] = pd.read_csv(file_path)
+    if response.status_code == 200:
+        files_info = response.json()
+        file_mapping = {}
+        
+        for file_info in files_info:
+            file_name = file_info['name']
+            file_download_url = file_info['download_url']
+            
+            if file_name.endswith('.csv'):
+                csv_response = requests.get(file_download_url)
+                
+                if csv_response.status_code == 200:
+                    csv_content = pd.read_csv(StringIO(csv_response.text))
+                    file_mapping[file_name] = csv_content
+                    print(f"Successfully read CSV file: {file_name}")
+                else:
+                    print(f"Failed to download CSV file: {file_name}")
+    else:
+        print("Failed to retrieve files from the GitHub repository.")
     
     return file_mapping
 
@@ -65,11 +82,26 @@ def read_assignment_files(folder_path):
 def get_dataset(selected_assignment_file):
     return file_mapping[selected_assignment_file]
 
-# Define the folder path for CSV files
-folder_path = 'https://github.com/akshatasatpute/Stemcheck/tree/main/Files'
+# Define the GitHub API URL for the folder containing CSV files
+github_folder_url = 'https://api.github.com/repos/akshatasatpute/Stemcheck/contents/Files'
 
-# Read all assignment files from the folder
-file_mapping = read_assignment_files(folder_path)
+# Read all assignment files from the folder path obtained from GitHub
+file_mapping = read_assignment_files_from_github(github_folder_url)
+
+# Assign actual assignment file names
+assignment_files = list(file_mapping.keys())
+
+# Sample usage of accessing a dataset for a selected assignment file
+selected_assignment_file = assignment_files[0]  # Replace index with the desired assignment file
+if selected_assignment_file in file_mapping:
+    selected_dataset = get_dataset(selected_assignment_file)
+    print(selected_dataset)
+else:
+    print("Selected assignment file not found in the dataset.")
+
+# Function to get the dataset for a selected assignment file
+def get_dataset(selected_assignment_file):
+    return file_mapping[selected_assignment_file]
 
 # Streamlit app interface
 # Create the Streamlit app interface
