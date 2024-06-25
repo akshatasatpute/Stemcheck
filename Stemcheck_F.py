@@ -66,7 +66,7 @@ def get_dataset(selected_assignment_file):
     return file_mapping[selected_assignment_file]
 
 # Define the folder path for CSV files
-folder_path = r"C:\Users\User\OneDrive\VS GUI\GUI\venv\stemcheck files"
+folder_path = r"https://github.com/akshatasatpute/Stemcheck/tree/main/Files"
 
 # Read all assignment files from the folder
 file_mapping = read_assignment_files(folder_path)
