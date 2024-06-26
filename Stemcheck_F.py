@@ -4,9 +4,7 @@ import pyperclip
 import os
 import requests
 import pandas as pd
-from PIL import Image
 from io import BytesIO
-import tempfile
 
 # Function to read CSV files from a folder path obtained from GitHub and store them in a dictionary
 from io import StringIO 
