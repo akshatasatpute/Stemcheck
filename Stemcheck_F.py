@@ -4,6 +4,8 @@ import pyperclip
 import os
 import requests
 import pandas as pd
+from PIL import Image
+from io import BytesIO
 
 # Function to read CSV files from a folder path obtained from GitHub and store them in a dictionary
 from io import StringIO 
@@ -16,7 +18,16 @@ st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 image_path = https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png
-st.sidebar.image(image_path, width=150)
+#st.sidebar.image(image_path, width=150)
+response = requests.get(image_path)
+if response.status_code == 200:
+    image = Image.open(BytesIO(response.content))
+    
+    # Display image in the Streamlit sidebar
+    st.sidebar.image(image, width=150, caption="Logo Image")
+else:
+    st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
+    
 
 logo_path = https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png
 st.sidebar.image(logo_path, width=90)
