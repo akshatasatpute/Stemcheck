@@ -22,26 +22,28 @@ st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.
 # GitHub image URL provided by the user
 image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
 
-# Download image from GitHub, save it to a temporary file, and open it with PIL
+# Function to check if the content is an image
+def is_image(content):
+    image_formats = ("image/jpeg", "image/png", "image/gif")
+    return content.headers["content-type"] in image_formats
+
+# GitHub image URL provided by the user
+image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
+
+# Download image from GitHub and verify if it is an image
 try:
     response = requests.get(image_url)
     
-    if response.status_code == 200:
-        # Create a temporary file to save the image content
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_file.write(response.content)
-            
-            # Open the temporary image file with PIL
-            image = Image.open(temp_file.name)
-            
-            # Display the image in the Streamlit sidebar
-            st.sidebar.image(image, width=150, caption="Logo Image")
+    if response.status_code == 200 and is_image(response):
+        image = Image.open(BytesIO(response.content))
+        
+        # Display image in the Streamlit sidebar
+        st.sidebar.image(image, width=150, caption="Logo Image")
     else:
-        st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
+        st.sidebar.error("Failed to fetch the image or the content is not in a supported image format. Please check the URL provided.")
     
 except Exception as e:
     st.error(f"An error occurred: {e}")
-    
 
 logo_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png"
 #st.sidebar.image(logo_path, width=90)
