@@ -20,42 +20,16 @@ st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # GitHub image URL provided by the user
 # GitHub image URL provided by the user
-image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
 
-# Function to check if the content is an image
-def is_image(content):
-    image_formats = ("image/jpeg", "image/png", "image/gif")
-    return content.headers["content-type"] in image_formats
 
 # GitHub image URL provided by the user
-image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
+#image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
+#st.sidebar.image(image_url, width=90)
 
-# Download image from GitHub and verify if it is an image
-try:
-    response = requests.get(image_url)
-    
-    if response.status_code == 200 and is_image(response):
-        image = Image.open(BytesIO(response.content))
-        
-        # Display image in the Streamlit sidebar
-        st.sidebar.image(image, width=150, caption="Logo Image")
-    else:
-        st.sidebar.error("Failed to fetch the image or the content is not in a supported image format. Please check the URL provided.")
-    
-except Exception as e:
-    st.error(f"An error occurred: {e}")
 
-logo_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png"
+#logo_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png"
 #st.sidebar.image(logo_path, width=90)
-response = requests.get(logo_path)
-if response.status_code == 200:
-    image = Image.open(BytesIO(response.content))
-    
-    # Display image in the Streamlit sidebar
-    st.sidebar.image(image, width=150, caption="Logo Image")
-else:
-    st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
-    
+
 
 # Predefined dictionary of user names and access codes known only to administrators
 user_access_codes = {
