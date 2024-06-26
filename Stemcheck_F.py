@@ -17,7 +17,7 @@ st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.
 
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
-image_path = https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png
+image_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
 #st.sidebar.image(image_path, width=150)
 response = requests.get(image_path)
 if response.status_code == 200:
