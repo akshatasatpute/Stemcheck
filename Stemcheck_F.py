@@ -29,8 +29,17 @@ else:
     st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
     
 
-logo_path = https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png
-st.sidebar.image(logo_path, width=90)
+logo_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png"
+#st.sidebar.image(logo_path, width=90)
+response = requests.get(logo_path)
+if response.status_code == 200:
+    image = Image.open(BytesIO(response.content))
+    
+    # Display image in the Streamlit sidebar
+    st.sidebar.image(image, width=150, caption="Logo Image")
+else:
+    st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
+    
 
 # Predefined dictionary of user names and access codes known only to administrators
 user_access_codes = {
