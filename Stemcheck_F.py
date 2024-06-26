@@ -333,7 +333,7 @@ if selected_comments_accepted:
     if st.button(combined_button_text):
         # Copy the comment to the clipboard
         st.code(selected_comments_text_accepted)
-        st.write("Please copy the comment above if needed.")
+        
         
         # Create a DataFrame with the feedback data
         feedback_df = create_feedback_dataframe(unique_key, selected_user_name, selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_comments_accepted, marks,selected_Cohort)
@@ -367,7 +367,7 @@ if selected_comments_accepted:
 
 
         # Inform the user about the actions taken
-        st.write("Comment copied to clipboard, Feedback data saved to Feedback.xlsx")
+        st.write(" Feedback data saved to Database")
         
 
         # Fetch and display data from Supabase table 'TableF'
