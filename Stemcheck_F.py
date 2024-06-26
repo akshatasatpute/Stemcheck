@@ -63,7 +63,7 @@ def read_assignment_files_from_github(folder_path_url):
                 if csv_response.status_code == 200:
                     csv_content = pd.read_csv(StringIO(csv_response.text))
                     file_mapping[file_name] = csv_content
-                    st.write(f"Successfully read CSV file: {file_name}")
+                    #st.write(f"Successfully read CSV file: {file_name}")
                 else:
                     st.write(f"Failed to download CSV file: {file_name}")
     else:
