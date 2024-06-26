@@ -262,18 +262,15 @@ if selected_email and selected_assignment_file:
     entered_marks = st.text_input("Enter Marks:", key=marks_key)
     marks = int(entered_marks) if entered_marks.isdigit() else None if entered_marks else None
 
-    # Display the entered marks
-    if marks is not None:
-        st.write(f"Entered Marks: {marks}")
-    else:
-        st.warning("Please enter a valid integer for marks.")
 
     # Check if either of the boxes is not selected
-    #if not marks:
-       # st.error("Please fill in all the compulsory fields marked with * before proceeding.")
-       # st.stop()
-    #if marks:
-       # st.write(f"Marks entered: {marks}")
+    if not marks:
+        st.error("Please fill in all the compulsory fields marked with * before proceeding.")
+        st.stop()
+    if marks:
+        st.write(f"Marks entered: {marks}")
+    else:
+        st.warning("Please enter a valid integer for marks.")
 
 
 # Add an empty line to visually separate the elements
