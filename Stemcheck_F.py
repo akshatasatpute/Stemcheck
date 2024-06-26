@@ -259,11 +259,11 @@ if 'Accepted /Rejected' in category_dataset.columns and 'Comment' in category_da
 # Create a text box to enter marks for the selected email ID and assignment file
 if selected_email and selected_assignment_file:
     def is_int(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
 
     # Your Streamlit app code
     marks_key = f"marks_{selected_email}_{selected_assignment_file}"
