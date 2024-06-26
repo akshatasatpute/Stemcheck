@@ -17,16 +17,23 @@ st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.
 
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
-image_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
-#st.sidebar.image(image_path, width=150)
-response = requests.get(image_path)
-if response.status_code == 200:
-    image = Image.open(BytesIO(response.content))
+# GitHub image URL provided by the user
+image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
+
+# Download image from GitHub and handle exceptions
+try:
+    response = requests.get(image_url)
     
-    # Display image in the Streamlit sidebar
-    st.sidebar.image(image, width=150, caption="Logo Image")
-else:
-    st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
+    if response.status_code == 200:
+        image = Image.open(BytesIO(response.content))
+        
+        # Display image in the Streamlit sidebar
+        st.sidebar.image(image, width=150, caption="Logo Image")
+    else:
+        st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
+    
+except Exception as e:
+    st.error(f"An error occurred: {e}")
     
 
 logo_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png"
