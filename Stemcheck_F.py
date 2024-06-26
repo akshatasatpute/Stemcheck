@@ -91,9 +91,6 @@ if selected_assignment_file in file_mapping:
 else:
     print("Selected assignment file not found in the dataset.")
 
-# Function to get the dataset for a selected assignment file
-def get_dataset(selected_assignment_file):
-    return file_mapping[selected_assignment_file]
 
 # Streamlit app interface
 # Create the Streamlit app interface
