@@ -256,14 +256,14 @@ if 'Accepted /Rejected' in category_dataset.columns and 'Comment' in category_da
 # Create a text box to enter marks for the selected email ID and assignment file
 if selected_email and selected_assignment_file:
     marks_key = f"marks_{selected_email}_{selected_assignment_file}"
-    entered_marks = st.text_input("Enter Marks:", key=marks_key)
+    entered_marks = st.text_input("Enter Marks (Integer only):", key=marks_key)
     marks = int(entered_marks) if entered_marks.isdigit() else None if entered_marks else None
 
 
     # Check if either of the boxes is not selected
     if not marks:
-        st.error("Please fill in all the compulsory fields marked with * before proceeding.")
         st.warning("Please enter a valid integer for marks.")
+        st.error("Please fill in all the compulsory fields marked with * before proceeding.")
         st.stop()
     if marks:
         st.write(f"Marks entered: {marks}")
