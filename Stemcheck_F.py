@@ -261,7 +261,7 @@ if selected_email and selected_assignment_file:
     marks_key = f"marks_{selected_email}_{selected_assignment_file}"
     marks = st.text_input("Enter Marks:*", key=marks_key)
     if marks and is_int(marks):
-    marks = int(marks)
+        marks = int(marks)
     else:
         st.warning("Please enter a valid integer value for marks.")
     # Check if either of the boxes is not selected
