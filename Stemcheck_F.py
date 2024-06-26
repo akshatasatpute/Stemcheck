@@ -6,6 +6,7 @@ import requests
 import pandas as pd
 from PIL import Image
 from io import BytesIO
+import tempfile
 
 # Function to read CSV files from a folder path obtained from GitHub and store them in a dictionary
 from io import StringIO 
@@ -18,17 +19,23 @@ st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # GitHub image URL provided by the user
+# GitHub image URL provided by the user
 image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
 
-# Download image from GitHub and handle exceptions
+# Download image from GitHub, save it to a temporary file, and open it with PIL
 try:
     response = requests.get(image_url)
     
     if response.status_code == 200:
-        image = Image.open(BytesIO(response.content))
-        
-        # Display image in the Streamlit sidebar
-        st.sidebar.image(image, width=150, caption="Logo Image")
+        # Create a temporary file to save the image content
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(response.content)
+            
+            # Open the temporary image file with PIL
+            image = Image.open(temp_file.name)
+            
+            # Display the image in the Streamlit sidebar
+            st.sidebar.image(image, width=150, caption="Logo Image")
     else:
         st.sidebar.error("Failed to fetch the image. Please check the URL provided.")
     
