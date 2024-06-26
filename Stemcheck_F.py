@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-#import pyperclip
+import pyperclip
 import os
 import requests
 
