@@ -63,11 +63,11 @@ def read_assignment_files_from_github(folder_path_url):
                 if csv_response.status_code == 200:
                     csv_content = pd.read_csv(StringIO(csv_response.text))
                     file_mapping[file_name] = csv_content
-                    print(f"Successfully read CSV file: {file_name}")
+                    st.write(f"Successfully read CSV file: {file_name}")
                 else:
-                    print(f"Failed to download CSV file: {file_name}")
+                    st.write(f"Failed to download CSV file: {file_name}")
     else:
-        print("Failed to retrieve files from the GitHub repository.")
+        st.write("Failed to retrieve files from the GitHub repository.")
     
     return file_mapping
 
@@ -88,7 +88,6 @@ assignment_files = list(file_mapping.keys())
 selected_assignment_file = assignment_files[0]  # Replace index with the desired assignment file
 if selected_assignment_file in file_mapping:
     selected_dataset = get_dataset(selected_assignment_file)
-    print(selected_dataset)
 else:
     print("Selected assignment file not found in the dataset.")
 
