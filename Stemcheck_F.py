@@ -333,7 +333,6 @@ if selected_comments_accepted:
     if st.button(combined_button_text):
         # Copy the comment to the clipboard
         st.code(selected_comments_text_accepted)
-        pyperclip.copy(selected_comments_accepted)
         
         
         # Create a DataFrame with the feedback data
