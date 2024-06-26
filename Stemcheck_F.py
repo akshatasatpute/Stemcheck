@@ -258,22 +258,16 @@ if 'Accepted /Rejected' in category_dataset.columns and 'Comment' in category_da
 
 # Create a text box to enter marks for the selected email ID and assignment file
 if selected_email and selected_assignment_file:
-    def is_int(s):
-        try:
-            int(s)
-            return True
-        except ValueError:
-            return False
-
-    # Your Streamlit app code
     marks_key = f"marks_{selected_email}_{selected_assignment_file}"
-    marks = st.text_input("Enter Marks:*", key=marks_key)
+    entered_marks = st.text_input("Enter Marks:", key=marks_key)
+    marks = int(entered_marks) if entered_marks.isdigit() else None if entered_marks else None
 
-    if marks and is_int(marks):
-        marks = int(marks)
+    # Display the entered marks
+    if marks is not None:
+        st.write(f"Entered Marks: {marks}")
     else:
-        st.warning("Please enter a valid integer value for marks.")
-        
+        st.warning("Please enter a valid integer for marks.")
+
     # Check if either of the boxes is not selected
     if not marks:
         st.error("Please fill in all the compulsory fields marked with * before proceeding.")
