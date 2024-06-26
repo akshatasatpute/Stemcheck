@@ -260,6 +260,10 @@ if 'Accepted /Rejected' in category_dataset.columns and 'Comment' in category_da
 if selected_email and selected_assignment_file:
     marks_key = f"marks_{selected_email}_{selected_assignment_file}"
     marks = st.text_input("Enter Marks:*", key=marks_key)
+    if marks and is_int(marks):
+    marks = int(marks)
+    else:
+        st.warning("Please enter a valid integer value for marks.")
     # Check if either of the boxes is not selected
     if not marks:
         st.error("Please fill in all the compulsory fields marked with * before proceeding.")
@@ -313,12 +317,12 @@ def read_data_from_supabase(table_name):
     return response.get('data')
 
 # Create a button to copy the comment for the email ID, save feedback data, and extract email IDs
-if selected_comments_accepted:
+if all_comments:
     combined_button_text = "Copy Comment, Save Feedback Data, and Extract Email IDs"
     if st.button(combined_button_text):
         # Copy the comment to the clipboard
         #pyperclip.copy(selected_comments_text_accepted)
-        st.code(selected_comments_accepted)
+        st.code(all_comments)
         
         # Create a DataFrame with the feedback data
         feedback_df = create_feedback_dataframe(unique_key, selected_user_name, selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_comments_accepted, marks,selected_Cohort)
