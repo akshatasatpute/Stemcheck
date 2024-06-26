@@ -266,11 +266,12 @@ if selected_email and selected_assignment_file:
     # Check if either of the boxes is not selected
     if not marks:
         st.error("Please fill in all the compulsory fields marked with * before proceeding.")
+        st.warning("Please enter a valid integer for marks.")
         st.stop()
     if marks:
         st.write(f"Marks entered: {marks}")
-    else:
-        st.warning("Please enter a valid integer for marks.")
+    #else:
+        #st.warning("Please enter a valid integer for marks.")
 
 
 # Add an empty line to visually separate the elements
