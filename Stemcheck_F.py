@@ -332,7 +332,7 @@ if selected_comments_accepted:
     combined_button_text = "Copy Comment, Save Feedback Data, and Extract Email IDs"
     if st.button(combined_button_text):
         # Copy the comment to the clipboard
-        st.write(selected_comments_text_accepted)
+        st.code(selected_comments_text_accepted)
         st.write("Please copy the comment above if needed.")
         
         # Create a DataFrame with the feedback data
