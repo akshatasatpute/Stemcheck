@@ -1,33 +1,22 @@
 import streamlit as st
 import pandas as pd
-import pyperclip
+#import pyperclip
 import os
 import requests
-import pandas as pd
-from io import BytesIO
 
-# Function to read CSV files from a folder path obtained from GitHub and store them in a dictionary
-from io import StringIO 
 from supabase_py import create_client,Client
-
+from io import StringIO  # Import StringIO directly from the io module
 
 # Set initial scale for very small screens
 st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.5">', unsafe_allow_html=True)
 
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
-# GitHub image URL provided by the user
-# GitHub image URL provided by the user
+image_path = r"C:\Users\User\Desktop\Career-Exploration-main\graphics\VS-logo.png"
+st.sidebar.image(image_path, width=150)
 
-
-# GitHub image URL provided by the user
-#image_url = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/VS-logo.png"
-#st.sidebar.image(image_url, width=90)
-
-
-#logo_path = "https://github.com/akshatasatpute/Stemcheck/blob/main/graphics/Assign_logo.png"
-#st.sidebar.image(logo_path, width=90)
-
+logo_path = r"C:\Users\User\Downloads\pngtree-vector-assignment-icon-png-image_4254076.jpg"
+st.sidebar.image(logo_path, width=90)
 
 # Predefined dictionary of user names and access codes known only to administrators
 user_access_codes = {
@@ -55,10 +44,6 @@ selected_Cohort = st.sidebar.selectbox("Select an option", ["Incubator_1","Incub
 # Display the selected option
 st.write("Selected Option:", selected_Cohort)
 
-# Read all assignment files and store them in a dictionary
-
-
-# Function to read all CSV files from a folder and store them in a dictionary # Import StringIO directly from the io module
 
 # Function to read CSV files from a folder path obtained from GitHub and store them in a dictionary
 def read_assignment_files_from_github(folder_path_url):
@@ -182,7 +167,8 @@ if 'user/email' in filtered_data.columns:
     if selected_email:
         copy_email_button_text = "Copy Email Address"
         if st.button(copy_email_button_text):
-            st.code(selected_email)  # Copy the email address to the clipboard
+            #pyperclip.copy(selected_email)  # Copy the email address to the clipboard
+            st.code(selected_email)
             st.write("Email address copied to clipboard")  # Inform the user that the email address has been copied
 
     if not filtered_email_data.empty:
@@ -332,8 +318,8 @@ if selected_comments_accepted:
     combined_button_text = "Copy Comment, Save Feedback Data, and Extract Email IDs"
     if st.button(combined_button_text):
         # Copy the comment to the clipboard
-        st.code(selected_comments_text_accepted)
-        
+        #pyperclip.copy(selected_comments_text_accepted)
+        st.code(selected_comments_accepted)
         
         # Create a DataFrame with the feedback data
         feedback_df = create_feedback_dataframe(unique_key, selected_user_name, selected_assignment_file, selected_status, latest_submission_email, latest_submission_no, selected_email, latest_messages, selected_comments_accepted, marks,selected_Cohort)
@@ -367,7 +353,7 @@ if selected_comments_accepted:
 
 
         # Inform the user about the actions taken
-        st.write(" Feedback data saved to Database")
+        st.write("Comment copied to clipboard, Feedback data saved to Feedback.xlsx")
         
 
         # Fetch and display data from Supabase table 'TableF'
