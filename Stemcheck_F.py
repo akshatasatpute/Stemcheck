@@ -12,10 +12,11 @@ st.markdown('<meta name="viewport" content="width=device-width, initial-scale=0.
 
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
 # Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
-image_path = r"C:\Users\User\Desktop\Career-Exploration-main\graphics\VS-logo.png"
+# Display the PNG image in the top left corner of the Streamlit sidebar with custom dimensions
+image_path = "https://bvvaailuzioczysisnoc.supabase.co/storage/v1/object/sign/Stemcheck/VS-logo.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJTdGVtY2hlY2svVlMtbG9nby5wbmciLCJpYXQiOjE3MTk1NTU1NDksImV4cCI6MTc1MTA5MTU0OX0.kwQL6_SjukgBtAsMK9LdKV0zGbJ4wgdtYfwZssPjNW4&t=2024-06-28T06%3A19%3A08.934Z"
 st.sidebar.image(image_path, width=150)
 
-logo_path = r"C:\Users\User\Downloads\pngtree-vector-assignment-icon-png-image_4254076.jpg"
+logo_path = "https://bvvaailuzioczysisnoc.supabase.co/storage/v1/object/sign/Stemcheck/Logo__.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJTdGVtY2hlY2svTG9nb19fLmpwZyIsImlhdCI6MTcxOTU1NTU3MCwiZXhwIjoxNzUxMDkxNTcwfQ.n-egtg-wl-E24wfMqyByUagLUNe8D6oBYHBFBQkeyvE&t=2024-06-28T06%3A19%3A28.903Z"
 st.sidebar.image(logo_path, width=90)
 
 # Predefined dictionary of user names and access codes known only to administrators
